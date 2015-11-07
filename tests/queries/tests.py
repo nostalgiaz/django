@@ -965,6 +965,24 @@ class Queries1Tests(BaseQuerysetTest):
             Item.objects.filter(Q(tags__name__in=['t4', 't3'])),
             [repr(i) for i in Item.objects.filter(~~Q(tags__name__in=['t4', 't3']))])
 
+    def test_exclude_not_yet_saved_instance(self):
+        with self.assertRaises(ValueError):
+            Tag.objects.exclude(category=NamedCategory())
+
+    def test_exclude_a_not_saved_item_and_then_save_it(self):
+        category = NamedCategory()
+        local_q = Q(category=category)
+        category.save()
+        final_query = Tag.objects.exclude(local_q)
+        self.assertGreaterEqual(final_query.count(), 1)
+
+    def test_exclude_not_yet_saved_instance_without_saving_it(self):
+        with self.assertRaises(ValueError):
+            category = NamedCategory()
+            local_q = Q(category=category)
+            final_query = Tag.objects.exclude(local_q)
+            list(Tag.objects.exclude(final_query))
+
     def test_ticket_10790_1(self):
         # Querying direct fields with isnull should trim the left outer join.
         # It also should not create INNER JOIN.

@@ -295,6 +295,16 @@ to use this form::
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
 
+Querying using unsaved objects raises an error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It seems reasonable to throw an exception if the primary key is None instead of returing an empty list.
+
+        >>> book = Book.objects.exclude(author=Author())
+        Traceback (most recent call last):
+        ...
+        ValueError: Cannot filter a query using a not saved instance.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

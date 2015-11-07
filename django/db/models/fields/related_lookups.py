@@ -22,6 +22,8 @@ class MultiColSource(object):
 def get_normalized_value(value, lhs):
     from django.db.models import Model
     if isinstance(value, Model):
+        if value.pk is None:
+            raise ValueError('Cannot filter a query using a not saved instance')
         value_list = []
         # A case like Restaurant.objects.filter(place=restaurant_instance),
         # where place is a OneToOneField and the primary key of Restaurant.
